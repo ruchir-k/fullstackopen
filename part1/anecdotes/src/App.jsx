@@ -4,33 +4,6 @@ function getRandomInt(max) {
   return Math.floor(Math.random() * max);
 }
 
-const MostVoted = ({anecdotes, points}) => {
-  let highestIdx = 0
-  let maxPoints = 0
-
-  for(let i=0; i < anecdotes.length; i++) {
-    if(points[i] > maxPoints) {
-      highestIdx = i
-      maxPoints = points[i]
-    }
-  }
-
-  if(maxPoints == 0) {
-    return(
-      <></>
-    )
-  }
-
-  return(
-    <>
-      <h1>Anectode with most votes</h1>
-      <div>
-        {anecdotes[highestIdx]}
-      </div>
-    </>
-  )
-}
-
 const App = () => {
   const anecdotes = [
     'If it hurts, do it more often.',
@@ -45,6 +18,17 @@ const App = () => {
    
   const [selected, setSelected] = useState(0)
   const [points, setPoints] = useState(new Uint8Array(anecdotes.length))
+  const [mostPoints, setMostPoints] = useState(0)
+
+  const voteSelected = () => {
+    const newPoints = {...points}
+    newPoints[selected] += 1
+    setPoints(newPoints)
+    
+    if(newPoints[selected] > points[mostPoints]) {
+      setMostPoints(selected)
+    }
+  }
 
   return (
     <div>
@@ -56,16 +40,14 @@ const App = () => {
         has {points[selected]} votes
       </div>
       <div>
-        <button onClick={() => {
-          const copy = {...points}
-          copy[selected] += 1
-          setPoints(copy)
-        }}>vote</button>
+        <button onClick={voteSelected}>vote</button>
         <button onClick={() => {
           setSelected(getRandomInt(anecdotes.length))
         }}>next anecdote</button>
       </div>
-      <MostVoted anecdotes={anecdotes} points={points} />
+      <h2>Anecdote with the most votes</h2>
+      <div>{anecdotes[mostPoints]}</div>
+      <div>has {points[mostPoints]} votes</div>
     </div>
   )
 }
